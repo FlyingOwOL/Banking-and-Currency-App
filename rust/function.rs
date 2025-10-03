@@ -19,7 +19,7 @@ pub struct CurrencyInfo {
 }
 
 
-fn input_number() -> u32 {
+fn input_number() -> u32 { //function to ask user input number
     loop {
         let mut input:String = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read");
@@ -31,7 +31,7 @@ fn input_number() -> u32 {
     }
 }
 
-fn enter_currency() -> Currency {
+fn enter_currency() -> Currency { //user string input for currency
     loop {
         print!("Enter currency [PHP, USD, JPY, GBP, EUR, CNY]: ");
         io::stdout().flush().unwrap(); // prompt appears first 
@@ -228,6 +228,7 @@ pub fn run() {
                         print!("Source Currency: ");
                         io::stdout().flush().unwrap(); // prompt appears first
                         source = input_number();
+                        let source_currency_info = &currency_info[source as usize - 1]; //currency information
 
                         if (source >= 1) && (source <= 6) {
                             break;
@@ -240,46 +241,56 @@ pub fn run() {
                     io::stdout().flush().unwrap(); // prompt appears first
                     let source_amount: f64 = input_number() as f64;
 
-                    let mut exchange: u32;
+                    if source_amount <= source_currency_info.balance {
+                        let mut exchange: u32;
 
-                    loop {
-                        println!("Exchange Currency Options");
-                        display_currency_menu();
-                        print!("Exchange Currency: ");
-                        io::stdout().flush().unwrap(); // prompt appears first
-                        exchange = input_number();
+                        loop {
+                            println!("Exchange Currency Options");
+                            display_currency_menu();
+                            print!("Exchange Currency: ");
+                            io::stdout().flush().unwrap(); // prompt appears first
+                            exchange = input_number();
 
-                        if (exchange >= 1) && (exchange <= 6) {
-                            if exchange == source {
-                                println!("Source and exchange currencies cannot be the same.");
-                                continue; // prompt again if same currency
-                            }
-                            else if (!currency_info[source as usize - 1].has_rate) || (!currency_info[exchange as usize - 1].has_rate) {
-                                println!("Please record exchange rates for the selected currencies first.");
-                                continue; // prompt again if no exchange rate
-                            }
-                            else {
-                                let source_currency = &currency_info[source as usize - 1];
-                                let exchange_currency_info = &currency_info[exchange as usize - 1];
-
-                                if source_currency.currency == Currency::PHP {
-                                    let exchange_amount = exchange_currency(source_amount, exchange_currency_info.exchange_rate_from_php); 
-                                    println!("Exchanged Amount: {:.2}", exchange_amount); 
+                            if (exchange >= 1) && (exchange <= 6) {
+                                if exchange == source {
+                                    println!("Source and exchange currencies cannot be the same.");
+                                    continue; // prompt again if same currency
                                 }
-                                else if exchange_currency_info.currency == Currency::PHP {
-                                    let exchange_amount = exchange_currency(source_amount, source_currency.exchange_rate_to_php);
-                                    println!("Exchanged Amount: {:.2}", exchange_amount);
+                                else if (!currency_info[source as usize - 1].has_rate) || (!currency_info[exchange as usize - 1].has_rate) {
+                                    println!("Please record exchange rates for the selected currencies first.");
+                                    continue; // prompt again if no exchange rate
                                 }
                                 else {
-                                    let php_amount = exchange_currency(source_amount, source_currency.exchange_rate_to_php);
-                                    let exchange_amount = exchange_currency(php_amount, exchange_currency_info.exchange_rate_from_php);
-                                    println!("Exchanged Amount: {:.2}", exchange_amount);
+                                    
+                                    let exchange_currency_info = &currency_info[exchange as usize - 1];
+                                    let exchange_amount: f64;
+
+                                    if source_currency_info.currency == Currency::PHP {
+                                        exchange_amount = exchange_currency(source_amount, exchange_currency_info.exchange_rate_from_php); 
+                                        println!("Exchanged Amount: {:.2}", exchange_amount); 
+                                    }
+                                    else if exchange_currency_info.currency == Currency::PHP {
+                                        exchange_amount = exchange_currency(source_amount, source_currency_info.exchange_rate_to_php);
+                                        println!("Exchanged Amount: {:.2}", exchange_amount);
+                                    }
+                                    else {
+                                        let php_amount = exchange_currency(source_amount, source_currency_info.exchange_rate_to_php);
+                                        exchange_amount = exchange_currency(php_amount, exchange_currency_info.exchange_rate_from_php);
+                                        println!("Exchanged Amount: {:.2}", exchange_amount);
+                                    }
+                                    
+                                    _balance = find_currency_balance(&mut currency_info, source_currency_info.currency);
+                                    withdraw(_balance, source_amount); //deduct the currency to be exchange
+                                    _balance = find_currency_balance(&mut currency_info, exchange_currency_info.currency);
+                                    deposit(_balance, exchange_amount); //add the currency exchanged
                                 }
+                                break;
+                            } else {
+                                println!("Invalid choice! Please select a valid option.");
                             }
-                            break;
-                        } else {
-                            println!("Invalid choice! Please select a valid option.");
                         }
+                    } else {
+                        println!("Insufficient balance. Available balance: {:.2}", source_currency_info.balance);
                     }
                     
 
