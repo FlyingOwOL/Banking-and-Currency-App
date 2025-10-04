@@ -51,12 +51,13 @@ fn daily_interest_calculation(balance: f64) -> f64 {
 fn compute_interest(day: u32, balance: f64) {
     let mut daily_balance = balance;
 
-    println!("Day\t|Interest\t|Balance");
+    println!("{:<5}|{:<12}|{:<12}", "Day", "Interest", "Balance");
+    println!("_____|_____________|____________");
     for i in 0..day {
-        let interest = daily_interest_calculation(daily_balance);
-        let day_number:u32 = i + 1;
+        let interest = (daily_interest_calculation(daily_balance) * 100.0).round() / 100.0; //
+        let day_number: u32 = i + 1;
         daily_balance += interest;
-        println!("{day_number}\t|{interest:.2}\t|{daily_balance:.2}");
+        println!("{:<5}|{:<12.2}|{:<12.2}", day_number, interest, daily_balance);
     }
 }
 
@@ -204,13 +205,13 @@ pub fn run() {
                 loop {
                     println!("-----Currency Exchange-----");
 
-                    //variables
+                    //variable
                     let mut source: u32;
                     let mut exchange: u32;
-                    let mut exchange_amount: f64;
-                    let mut source_amount: f64;
+                    let exchange_amount: f64;
+                    let source_amount: f64;
                     let mut source_currency_info: &CurrencyInfo;
-                    let mut exchange_currency_info: &CurrencyInfo;
+                    let exchange_currency_info: &CurrencyInfo;
 
                     loop {
                         println!("Source Currency Options");
@@ -328,6 +329,7 @@ pub fn run() {
                     loop {
                         println!("-----Compute Interest-----");
                         display_account_info(&account);
+                        println!("Interest Rate: 5%");
                         print!("Enter number of days to compute interest for: ");
 
                         io::stdout().flush().unwrap(); // prompt appears first
