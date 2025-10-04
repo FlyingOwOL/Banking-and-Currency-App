@@ -12,10 +12,14 @@ pub enum Currency {
 
 pub struct CurrencyInfo {
     pub currency: Currency,
-    pub balance: f64,
     pub exchange_rate_from_php: f64,
     pub exchange_rate_to_php: f64,
     pub has_rate: bool
+}
+
+pub struct Account {
+    pub name: String,
+    pub balance: f64
 }
 
 
@@ -31,40 +35,12 @@ fn input_number() -> u32 { //function to ask user input number
     }
 }
 
-fn enter_currency() -> Currency { //user string input for currency
-    loop {
-        print!("Enter currency [PHP, USD, JPY, GBP, EUR, CNY]: ");
-        io::stdout().flush().unwrap(); // prompt appears first 
-
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read");
-        match input.trim().to_lowercase().as_str() {
-            "php" => return Currency::PHP,
-            "usd" => return Currency::USD,
-            "jpy" => return Currency::JPY,
-            "gbp" => return Currency::GBP,
-            "eur" => return Currency::EUR,
-            "cny" => return Currency::CNY,
-            _ => println!("Invalid input! Please enter a valid currency."),
-        }
-    }
-}
-
-fn find_currency_balance(currency_info: &mut [CurrencyInfo], currency: Currency) -> &mut f64 {
-    for i in currency_info.iter_mut() {
-        if i.currency == currency {
-            return &mut i.balance;
-        }
-    }
-    panic!("Currency not found");
-}
-
-fn register_account_name() -> String{
+fn register_account_name(account: &mut Account) {
     let mut name = String::new();
     println!("Enter your account name:");
     io::stdin().read_line(&mut name).expect("Failed to read");
     println!("Account Name: {} has been registered", name.trim());
-    name.trim().to_string()
+    account.name = name.trim().to_string();
 }
 
 fn daily_interest_calculation(balance: f64) -> f64 {
@@ -125,19 +101,25 @@ fn display_currency_menu() {
     println!("[6] CNY");
 }
 
+fn display_account_info(account: &Account) {
+    println!("Account Name: {}", account.name);
+    println!("Balance: {:.2}", account.balance);
+    println!("Currency: PHP");
+}
+
 pub fn run() {
+    let mut account = Account { name: String::new(), balance: 0.0 };
     let mut has_account: bool = false;
     let mut currency: Currency;
     let mut _amount: f64;
-    let mut _balance: &mut f64;
-    let _exchange_rate: &mut f64;
+    let mut _exchange_rate: &mut f64;
     let mut currency_info: [CurrencyInfo; 6] = [
-        CurrencyInfo { currency: Currency::PHP, balance: 0.0 , exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
-        CurrencyInfo { currency: Currency::USD, balance: 0.0 , exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
-        CurrencyInfo { currency: Currency::JPY, balance: 0.0 , exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
-        CurrencyInfo { currency: Currency::GBP, balance: 0.0 , exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
-        CurrencyInfo { currency: Currency::EUR, balance: 0.0 , exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
-        CurrencyInfo { currency: Currency::CNY, balance: 0.0 , exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
+        CurrencyInfo { currency: Currency::PHP, exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
+        CurrencyInfo { currency: Currency::USD, exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
+        CurrencyInfo { currency: Currency::JPY, exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
+        CurrencyInfo { currency: Currency::GBP, exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
+        CurrencyInfo { currency: Currency::EUR, exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
+        CurrencyInfo { currency: Currency::CNY, exchange_rate_from_php: 0.0, exchange_rate_to_php: 0.0, has_rate: false},
     ];
 
 
@@ -149,7 +131,7 @@ pub fn run() {
             1 => {
                 if !has_account {
                     println!("-----Register Account Name-----");
-                    register_account_name();
+                    register_account_name(&mut account);
                     has_account = true;
 
                     loop {
@@ -169,14 +151,15 @@ pub fn run() {
             2 => {
                 if has_account {
                     loop {
-                        println!("-----Deposit-----");
-                        currency = enter_currency();
-                        _balance = find_currency_balance(&mut currency_info, currency);
+                        println!("-----Deposit-----");     
+                        display_account_info(&account);
+
                         print!("Enter amount to deposit: ");
+
                         io::stdout().flush().unwrap(); // prompt appears first
                         _amount = input_number() as f64;
                         
-                        deposit(_balance, _amount);
+                        deposit(&mut account.balance, _amount);
 
                         println!("Back to the Main Menu[Y/N]?");
                         let mut input = String::new();
@@ -195,13 +178,14 @@ pub fn run() {
                 if has_account {
                     loop {
                         println!("-----Withdraw-----");
-                        currency = enter_currency();
-                        _balance = find_currency_balance(&mut currency_info, currency);
+                        display_account_info(&account);
+
                         print!("Enter amount to withdraw: ");
+
                         io::stdout().flush().unwrap(); // prompt appears first
                         _amount = input_number() as f64;      
             
-                        withdraw(_balance, _amount);
+                        withdraw(&mut account.balance, _amount);
 
                         println!("Back to the Main Menu[Y/N]?");
                         let mut input = String::new();
@@ -220,15 +204,24 @@ pub fn run() {
                 loop {
                     println!("-----Currency Exchange-----");
 
+                    //variables
                     let mut source: u32;
+                    let mut exchange: u32;
+                    let mut exchange_amount: f64;
+                    let mut source_amount: f64;
+                    let mut source_currency_info: &CurrencyInfo;
+                    let mut exchange_currency_info: &CurrencyInfo;
 
                     loop {
                         println!("Source Currency Options");
                         display_currency_menu();
+
                         print!("Source Currency: ");
+
                         io::stdout().flush().unwrap(); // prompt appears first
                         source = input_number();
-                        let source_currency_info = &currency_info[source as usize - 1]; //currency information
+
+                        source_currency_info = &currency_info[source as usize - 1]; //currency information
 
                         if (source >= 1) && (source <= 6) {
                             break;
@@ -239,60 +232,48 @@ pub fn run() {
 
                     print!("Source Amount: ");
                     io::stdout().flush().unwrap(); // prompt appears first
-                    let source_amount: f64 = input_number() as f64;
 
-                    if source_amount <= source_currency_info.balance {
-                        let mut exchange: u32;
+                    source_amount = input_number() as f64;
 
-                        loop {
-                            println!("Exchange Currency Options");
-                            display_currency_menu();
-                            print!("Exchange Currency: ");
-                            io::stdout().flush().unwrap(); // prompt appears first
-                            exchange = input_number();
+                    loop {
+                        println!("Exchange Currency Options");
+                        display_currency_menu();
+                        print!("Exchange Currency: ");
 
-                            if (exchange >= 1) && (exchange <= 6) {
-                                if exchange == source {
-                                    println!("Source and exchange currencies cannot be the same.");
-                                    continue; // prompt again if same currency
+                        io::stdout().flush().unwrap(); // prompt appears first
+                        exchange = input_number();
+
+                        if (exchange >= 1) && (exchange <= 6) {
+                            if exchange == source {
+                                println!("Source and exchange currencies cannot be the same.");
+                                continue; // prompt again if same currency
+                            }
+                            else if (!currency_info[source as usize - 1].has_rate) || (!currency_info[exchange as usize - 1].has_rate) {
+                                println!("Please record exchange rates for the selected currencies first.");
+                                continue; // prompt again if no exchange rate
+                            }
+                            else {
+                                exchange_currency_info = &currency_info[exchange as usize - 1];
+
+                                if source_currency_info.currency == Currency::PHP {
+                                    exchange_amount = exchange_currency(source_amount, exchange_currency_info.exchange_rate_from_php); 
+                                    println!("Exchanged Amount: {:.2}", exchange_amount); 
                                 }
-                                else if (!currency_info[source as usize - 1].has_rate) || (!currency_info[exchange as usize - 1].has_rate) {
-                                    println!("Please record exchange rates for the selected currencies first.");
-                                    continue; // prompt again if no exchange rate
+                                else if exchange_currency_info.currency == Currency::PHP {
+                                    exchange_amount = exchange_currency(source_amount, source_currency_info.exchange_rate_to_php);
+                                    println!("Exchanged Amount: {:.2}", exchange_amount);
                                 }
                                 else {
-                                    
-                                    let exchange_currency_info = &currency_info[exchange as usize - 1];
-                                    let exchange_amount: f64;
-
-                                    if source_currency_info.currency == Currency::PHP {
-                                        exchange_amount = exchange_currency(source_amount, exchange_currency_info.exchange_rate_from_php); 
-                                        println!("Exchanged Amount: {:.2}", exchange_amount); 
-                                    }
-                                    else if exchange_currency_info.currency == Currency::PHP {
-                                        exchange_amount = exchange_currency(source_amount, source_currency_info.exchange_rate_to_php);
-                                        println!("Exchanged Amount: {:.2}", exchange_amount);
-                                    }
-                                    else {
-                                        let php_amount = exchange_currency(source_amount, source_currency_info.exchange_rate_to_php);
-                                        exchange_amount = exchange_currency(php_amount, exchange_currency_info.exchange_rate_from_php);
-                                        println!("Exchanged Amount: {:.2}", exchange_amount);
-                                    }
-                                    
-                                    _balance = find_currency_balance(&mut currency_info, source_currency_info.currency);
-                                    withdraw(_balance, source_amount); //deduct the currency to be exchange
-                                    _balance = find_currency_balance(&mut currency_info, exchange_currency_info.currency);
-                                    deposit(_balance, exchange_amount); //add the currency exchanged
+                                    let php_amount = exchange_currency(source_amount, source_currency_info.exchange_rate_to_php);
+                                    exchange_amount = exchange_currency(php_amount, exchange_currency_info.exchange_rate_from_php);
+                                    println!("Exchanged Amount: {:.2}", exchange_amount);
                                 }
-                                break;
-                            } else {
-                                println!("Invalid choice! Please select a valid option.");
                             }
+                            break;
+                        } else {
+                            println!("Invalid choice! Please select a valid option.");
                         }
-                    } else {
-                        println!("Insufficient balance. Available balance: {:.2}", source_currency_info.balance);
-                    }
-                    
+                    }        
 
                     println!("Back to the Main Menu[Y/N]?");
                     let mut input = String::new();
@@ -303,7 +284,6 @@ pub fn run() {
                         _ => println!("Invalid input! Please enter Y or N."),
                     }
                 }
-
             },
             5 => {
                 loop {
@@ -347,14 +327,13 @@ pub fn run() {
                 if has_account {
                     loop {
                         println!("-----Compute Interest-----");
+                        display_account_info(&account);
                         print!("Enter number of days to compute interest for: ");
+
                         io::stdout().flush().unwrap(); // prompt appears first
                         let days: u32 = input_number();
 
-                        currency = enter_currency();
-                        _balance = find_currency_balance(&mut currency_info, currency);
-
-                        compute_interest(days, *_balance);
+                        compute_interest(days, account.balance);
 
                         println!("Back to the Main Menu[Y/N]?");
                         let mut input = String::new();
@@ -372,7 +351,8 @@ pub fn run() {
             },
             7 => {
                 println!("Exitting the program...");
-                break;          },
+                break;          
+            },
             _ => println!("Invalid choice! Please select a valid option."),
         }
     }
