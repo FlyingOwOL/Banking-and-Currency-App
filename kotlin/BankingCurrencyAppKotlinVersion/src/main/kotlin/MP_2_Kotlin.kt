@@ -11,24 +11,85 @@ import java.math.BigDecimal
 
 fun main() {
     var account: Account? = null
+    val conversionRates = mutableListOf(
+        ConversionData(Currency.PHP, Currency.PHP),
+        ConversionData(Currency.USD, Currency.PHP),
+        ConversionData(Currency.JPY, Currency.PHP),
+        ConversionData(Currency.GBP, Currency.PHP),
+        ConversionData(Currency.EUR, Currency.PHP),
+        ConversionData(Currency.CNY, Currency.PHP)
+    )
     var userInput: Int
     do {
         displayMenu()
         print("Enter your choice (1-7): ")
         userInput = readln().toIntOrNull() ?: -1
+        var willContinue: String
         when (userInput){
             1 -> {
-                var willContinue: String
                 do {
                     println("Register Account Name")
                     if (account == null) account = createAccount()
                     else println("Account already exists.")
-                    print("Back to the Main Menu? (Y/N): ")
                     willContinue = askToProceedMainMenu()
                 } while (willContinue == "N")
             }
             2 -> {
-                println("case 2")
+                do {
+                    println("Deposit Amount")
+                    if (account != null) {
+                        account.displayBalance()
+                        print("\nEnter amount to deposit: ")
+                        val depositAmount = readln().toBigDecimalOrNull() ?: 0.00.toBigDecimal()
+                        account.deposit(depositAmount)
+                        println("Updated Balance: ${account.balance.formatDecimal(2)}")
+                    }
+                    else println("Account not found. Please register an account first.")
+                    willContinue = askToProceedMainMenu()
+                } while (willContinue == "N")
+            }
+            3 -> {
+                do {
+                    println("Withdraw Amount")
+                    if (account != null) {
+                        account.displayBalance()
+                        print("\nEnter amount to withdraw: ")
+                        val withdrawAmount = readln().toBigDecimalOrNull() ?: 0.00.toBigDecimal()
+                        account.withdraw(withdrawAmount)
+                        println("Updated Balance: ${account.balance.formatDecimal(2)}")
+                    }
+                    else println("Account not found. Please register an account first.")
+                    willContinue = askToProceedMainMenu()
+                } while (willContinue == "N")
+            }
+            4 -> {
+                do {
+                    println("Record Exchange Rates")
+                    displayCurrencyMenu()
+                    print("\nSelect Foreign Currency: ")
+                    val currencyChoice = askValidCurrency()
+                    val selectedConversion = conversionRates.getOrNull(currencyChoice - 1)
+                    setCurrencyRate(selectedConversion)
+                    willContinue = askToProceedMainMenu()
+                } while (willContinue == "N")
+            }
+            5 -> {
+                //make sure that the selected conversion rates are not zero
+            }
+            6 -> {
+                do {
+                    val annualInterest = 0.05.toBigDecimal() // 5% annual interest
+                    println("Show Interest Computation")
+                    if (account != null) {
+                        account.displayBalance()
+                        println("Interest Rate: ${(annualInterest * 100.toBigDecimal()).intValueExact()}")
+                        print("\nEnter number of days to compute interest: ")
+                        val numDays = readln().toIntOrNull() ?: 0
+                        if (numDays > 0) account.calculateDailyInterest(numDays, annualInterest) else println("Invalid number of days.")
+                    }
+                    else println("Account not found. Please register an account first.")
+                    willContinue = askToProceedMainMenu()
+                } while (willContinue == "N")
             }
             7 -> {
                 println("Exiting the program. Goodbye!")
@@ -43,6 +104,30 @@ fun main() {
 //extension function to format Big Decimal values to specified decimal places
 fun BigDecimal.formatDecimal(digits: Int): String = this.setScale(digits, RoundingMode.HALF_UP).toPlainString()
 
+fun setCurrencyRate(selectedConversion: ConversionData?) : BigDecimal {
+    var rate: BigDecimal
+    if (selectedConversion != null) {
+        print("Enter exchange rate for ${selectedConversion.source.code} to ${selectedConversion.dest.code}: ")
+        rate = readln().toBigDecimalOrNull() ?: 0.00.toBigDecimal()
+        // Validate input to ensure it's a positive decimal number and is not empty
+        if (rate > 0.00.toBigDecimal()) {
+            selectedConversion.rate = rate
+        }
+        else println("Invalid exchange rate.")
+    } else {
+        println("Invalid currency selection.")
+        return 0.00.toBigDecimal()
+    }
+    return rate
+}
+fun askValidCurrency() : Int {
+    print("Select Currency (1-6): ")
+    do {
+        val currencyChoice = readln().toIntOrNull() ?: -1
+        if (currencyChoice in 1..6) return currencyChoice
+        else print("Invalid input. Please enter a number between 1 and 6: ")
+    } while (true)
+}
 fun createAccount() : Account? {
     print("Account Name (Leave blank for Default User): ")
     val name = readln().trim().ifEmpty {"Default User"}
@@ -59,7 +144,7 @@ fun askToProceedMainMenu() : String {
 }
 
 fun displayMenu() {
-    val options = arrayOf("Register Account Name", "Deposit Amount", "Withdraw Amount", "Currency Exchange", "Record Exchange Rates", "Show Interest Computation", "Exit")
+    val options = listOf("Register Account Name", "Deposit Amount", "Withdraw Amount", "Currency Exchange", "Record Exchange Rates", "Show Interest Computation", "Exit")
     println("Select Transaction:")
     for ((index, option) in options.withIndex()) {
         println("[${index + 1}] $option")
@@ -82,20 +167,22 @@ enum class Currency(val fullName: String, val code: String) {
     JPY("Japanese Yen", "JPY"),
     GBP("British Pound Sterling", "GBP"),
     EUR("Euro", "EUR"),
-    CNY("Chinese Yuan Renminni", "CNY")
+    CNY("Chinese Yuan Renminbi", "CNY")
 }
 
 //Account class with basic banking functionalities
 class Account(val name: String, val baseCurrency: Currency = Currency.PHP) {
-    private var balance = 0.00.toBigDecimal()
+    var balance = 0.00.toBigDecimal()
 
-    fun deposit(amount: BigDecimal, currency: Currency) {
+    fun deposit(amount: BigDecimal) {
         // For simplicity, ignoring currency conversion
         if (amount > 0.00.toBigDecimal()) balance += amount else println("Deposit amount must be positive")
     }
-    fun withdraw(amount: BigDecimal, currency: Currency) {
+    fun withdraw(amount: BigDecimal) {
         // For simplicity, ignoring currency conversion
-        if (amount > balance) println("Insufficient funds") else balance -= amount
+        if (amount > balance) println("Insufficient funds")
+        else if (amount < 0.00.toBigDecimal()) println("Withdrawal amount must be positive")
+        else balance -= amount
     }
     fun calculateDailyInterest(numDays: Int, annualInterest: BigDecimal) {
         println("Day | Interest | Balance")
@@ -114,7 +201,7 @@ class Account(val name: String, val baseCurrency: Currency = Currency.PHP) {
 //ConversionRate class to handle currency conversion
 // SOURCE CURRENCY, BASE CURRENCY, EXCHANGE RATE
 // Example : USD -> GBP will use USD->PHP and PHP->GBP since PHP is the base currency
-data class ConversionData(val source: Currency, val dest: Currency, var rate: BigDecimal) {
+data class ConversionData(val source: Currency, val dest: Currency, var rate: BigDecimal = 0.00.toBigDecimal()) {
     fun convert(amount: BigDecimal): BigDecimal {
         return amount * rate
     }
