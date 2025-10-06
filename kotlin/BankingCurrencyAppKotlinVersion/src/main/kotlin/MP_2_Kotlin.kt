@@ -12,7 +12,8 @@ import java.math.BigDecimal
 fun main() {
     var account: Account? = null
     val conversionRates = mutableListOf(
-        ConversionData(Currency.PHP, Currency.PHP),
+        //base currency is PHP
+        ConversionData(Currency.PHP, Currency.PHP, 1.00.toBigDecimal()),
         ConversionData(Currency.USD, Currency.PHP),
         ConversionData(Currency.JPY, Currency.PHP),
         ConversionData(Currency.GBP, Currency.PHP),
@@ -28,7 +29,7 @@ fun main() {
         when (userInput){
             1 -> {
                 do {
-                    println("Register Account Name")
+                    println("--| Register Account Name |--")
                     if (account == null) account = createAccount()
                     else println("Account already exists.")
                     willContinue = askToProceedMainMenu()
@@ -36,7 +37,7 @@ fun main() {
             }
             2 -> {
                 do {
-                    println("Deposit Amount")
+                    println("--| Deposit Amount |--")
                     if (account != null) {
                         account.displayBalance()
                         print("\nEnter amount to deposit: ")
@@ -50,7 +51,7 @@ fun main() {
             }
             3 -> {
                 do {
-                    println("Withdraw Amount")
+                    println("--| Withdraw Amount |--")
                     if (account != null) {
                         account.displayBalance()
                         print("\nEnter amount to withdraw: ")
@@ -63,8 +64,25 @@ fun main() {
                 } while (willContinue == "N")
             }
             4 -> {
+                //make sure that the selected conversion rates are not zero
                 do {
-                    println("Record Exchange Rates")
+                    println("--| Currency Exchange |--")
+                    println("Select Currency Option: ")
+                    displayCurrencyMenu()
+                    print("\nSelect Source Currency: ")
+                    val selectedSourceConversion = conversionRates.getOrNull(askValidCurrency() - 1)
+                    val sourceAmount = askValidAmount("Source amount: ")
+                    println("Exchanged Currency Options: ")
+                    displayCurrencyMenu()
+                    val selectedDestConversion = conversionRates.getOrNull(askValidCurrency() - 1)
+                    val destAmount = exchangeCurrencyValidation(selectedSourceConversion, selectedDestConversion, sourceAmount)
+                    println("Exchanged Amount: ${destAmount.formatDecimal(2)}")
+                    willContinue = askToProceedMainMenu()
+                } while (willContinue == "N")
+            }
+            5 -> {
+                do {
+                    println("--| Record Exchange Rates |--")
                     displayCurrencyMenu()
                     print("\nSelect Foreign Currency: ")
                     val currencyChoice = askValidCurrency()
@@ -73,16 +91,13 @@ fun main() {
                     willContinue = askToProceedMainMenu()
                 } while (willContinue == "N")
             }
-            5 -> {
-                //make sure that the selected conversion rates are not zero
-            }
             6 -> {
                 do {
                     val annualInterest = 0.05.toBigDecimal() // 5% annual interest
-                    println("Show Interest Computation")
+                    println("--| Show Interest Computation |--")
                     if (account != null) {
                         account.displayBalance()
-                        println("Interest Rate: ${(annualInterest * 100.toBigDecimal()).intValueExact()}")
+                        println("Interest Rate: ${(annualInterest * 100.toBigDecimal()).intValueExact()}%")
                         print("\nEnter number of days to compute interest: ")
                         val numDays = readln().toIntOrNull() ?: 0
                         if (numDays > 0) account.calculateDailyInterest(numDays, annualInterest) else println("Invalid number of days.")
@@ -92,7 +107,7 @@ fun main() {
                 } while (willContinue == "N")
             }
             7 -> {
-                println("Exiting the program. Goodbye!")
+                println("Exiting the program. Thank you!")
             }
             else -> {
                 println("Invalid input. Please enter a number between 1 and 7.\n")
@@ -103,6 +118,23 @@ fun main() {
 }
 //extension function to format Big Decimal values to specified decimal places
 fun BigDecimal.formatDecimal(digits: Int): String = this.setScale(digits, RoundingMode.HALF_UP).toPlainString()
+
+fun exchangeCurrencyValidation (selectedSourceConversion : ConversionData?, selectedDestConversion : ConversionData?, sourceAmount : BigDecimal) : BigDecimal {
+    if (selectedSourceConversion == null || selectedDestConversion == null) {
+        println("Invalid currency selection.")
+        return 0.00.toBigDecimal()
+    }
+    if (selectedSourceConversion.rate == 0.00.toBigDecimal() || selectedDestConversion.rate == 0.00.toBigDecimal()) {
+        println("One or both of the selected currency exchange rates are not set. Please record the exchange rates first.")
+        return 0.00.toBigDecimal()
+    } else {
+        // SOURCE CURRENCY, BASE CURRENCY, EXCHANGE RATE
+        // Example : USD -> GBP will use USD->PHP and PHP->GBP since PHP is the base currency
+        val sourceCurrencyAmount = selectedSourceConversion.sourceToDestination(sourceAmount)
+        return selectedDestConversion.destinationToSource(sourceCurrencyAmount)
+    }
+
+}
 
 fun setCurrencyRate(selectedConversion: ConversionData?) : BigDecimal {
     var rate: BigDecimal
@@ -120,6 +152,16 @@ fun setCurrencyRate(selectedConversion: ConversionData?) : BigDecimal {
     }
     return rate
 }
+
+fun askValidAmount(questionFormat : String) : BigDecimal {
+    print(questionFormat)
+    do {
+        val amount = readln().toBigDecimalOrNull() ?: 0.00.toBigDecimal()
+        if (amount > 0.00.toBigDecimal()) return amount
+        else print("Invalid input. Please enter a positive amount: ")
+    } while (true)
+}
+
 fun askValidCurrency() : Int {
     print("Select Currency (1-6): ")
     do {
@@ -128,6 +170,7 @@ fun askValidCurrency() : Int {
         else print("Invalid input. Please enter a number between 1 and 6: ")
     } while (true)
 }
+
 fun createAccount() : Account? {
     print("Account Name (Leave blank for Default User): ")
     val name = readln().trim().ifEmpty {"Default User"}
@@ -185,11 +228,16 @@ class Account(val name: String, val baseCurrency: Currency = Currency.PHP) {
         else balance -= amount
     }
     fun calculateDailyInterest(numDays: Int, annualInterest: BigDecimal) {
+        var balanceComputation = balance
+        println(numDays)
+        println(annualInterest / 365.toBigDecimal())
+        println(balanceComputation * (annualInterest / 365.toBigDecimal()))
         println("Day | Interest | Balance")
         for (day in 1..numDays) {
-            val dailyInterest = (balance * (annualInterest / BigDecimal(365)))
-            balance += dailyInterest
-            println("$day | $dailyInterest | ${balance.formatDecimal(2)}")
+            val dailyInterest = balanceComputation * (annualInterest.divide(365.toBigDecimal(), 20, RoundingMode.HALF_UP))
+
+            balanceComputation += dailyInterest
+            println("$day | ${dailyInterest.formatDecimal(2)} | ${balanceComputation.formatDecimal(2)}")
         }
     }
     fun displayBalance() {
@@ -199,13 +247,11 @@ class Account(val name: String, val baseCurrency: Currency = Currency.PHP) {
     }
 }
 //ConversionRate class to handle currency conversion
-// SOURCE CURRENCY, BASE CURRENCY, EXCHANGE RATE
-// Example : USD -> GBP will use USD->PHP and PHP->GBP since PHP is the base currency
 data class ConversionData(val source: Currency, val dest: Currency, var rate: BigDecimal = 0.00.toBigDecimal()) {
-    fun convert(amount: BigDecimal): BigDecimal {
-        return amount * rate
+    fun destinationToSource(amount: BigDecimal): BigDecimal {
+        return amount / rate
     }
     fun sourceToDestination(amount: BigDecimal): BigDecimal {
-        return amount / rate
+        return amount * rate
     }
 }
