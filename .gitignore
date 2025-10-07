@@ -17,6 +17,7 @@ build/
 
 # VS Code settings (keep your personal prefs out of the repo)
 .vscode/
+.idea/
 
 # Temporary files
 *.tmp

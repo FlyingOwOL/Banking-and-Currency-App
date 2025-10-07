@@ -171,7 +171,7 @@ fun askValidCurrency() : Int {
     } while (true)
 }
 
-fun createAccount() : Account? {
+fun createAccount() : Account {
     print("Account Name (Leave blank for Default User): ")
     val name = readln().trim().ifEmpty {"Default User"}
     return Account(name)
@@ -229,9 +229,6 @@ class Account(val name: String, val baseCurrency: Currency = Currency.PHP) {
     }
     fun calculateDailyInterest(numDays: Int, annualInterest: BigDecimal) {
         var balanceComputation = balance
-        println(numDays)
-        println(annualInterest / 365.toBigDecimal())
-        println(balanceComputation * (annualInterest / 365.toBigDecimal()))
         println("Day | Interest | Balance")
         for (day in 1..numDays) {
             val dailyInterest = balanceComputation * (annualInterest.divide(365.toBigDecimal(), 20, RoundingMode.HALF_UP))
