@@ -4,7 +4,7 @@ CURRENCY_RATES<-array(0.0,dim=c(length(CURRENCIES),length(CURRENCIES)))
 
 # User
 ACCOUNT_NAME<-NULL
-ACCOUNT_BALANCE<-0.0
+ACCOUNT_BALANCE<-100.0
 ACCOUNT_CURRENCY<-CURRENCIES[1]
 
 # Interest
@@ -313,7 +313,6 @@ state6 <- function() {
 					page_number<-page_number+1
 					page_content<-ifelse(page_number>1,10,11)
 					counter<-0
-					printer(paste(sep="","\npage_content=",page_content,",index=",index,"\n"))
 				}
 			}
 		}
