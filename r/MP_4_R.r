@@ -2,9 +2,14 @@
 CURRENCIES<-c("PHP","USD","JPY","GBP","EUR","CNY")
 CURRENCY_RATES<-array(0.0,dim=c(length(CURRENCIES),length(CURRENCIES)))
 
+# Defaults
+DEFAULT_ACCOUNT_NAME<-NULL
+DEFAULT_ACCOUNT_BALANCE<-0.0
+DEFAULT_ACCOUNT_CURRENCY<-CURRENCIES[1]
+
 # User
 ACCOUNT_NAME<-NULL
-ACCOUNT_BALANCE<-100.0
+ACCOUNT_BALANCE<-0.0
 ACCOUNT_CURRENCY<-CURRENCIES[1]
 
 # Interest
@@ -23,11 +28,18 @@ prompter <- function(placeholder) {
 # For sending outputs
 printer <- function(msg) { if (interactive()) print(msg) else cat(msg) }
 
+force_numeric <- function(input) {
+	# RegEx the input if it's numeric or not
+	isnum<-grepl("^([-+]?)((\\.?\\d+)|(\\d+\\.?(\\d+)?))$",input)
+	# Convert natively if numeric, otherwise return NA
+	return(ifelse(isnum,as.numeric(input),NA))
+}
+
 # For prompting user about which currency
 currency_selector <- function(header_text) {
 	prompt_ret<-NA
 	while (is.na(prompt_ret)||prompt_ret>length(CURRENCIES)||prompt_ret<1) {
-		prompt_ret<-as.numeric(prompter(paste(sep="",
+		prompt_ret<-force_numeric(prompter(paste(sep="",
 			"\n",header_text,"\n",
 			"[1] Philippine Peso (PHP)\n",
 			"[2] United States Dollar (USD)\n",
@@ -38,17 +50,14 @@ currency_selector <- function(header_text) {
 			"[7] Return to menu\n",
 			"\n>>>"
 		)))
-		if (prompt_ret==7)
+		if (!is.na(prompt_ret)&&prompt_ret==7)
 			return(0)
 	}
 	return(prompt_ret)
 }
 
 currency_converter <- function(amount,from,to) {
-	if (CURRENCY_RATES[from,to]==0.0)
-		return(NA)
-	else
-		return(CURRENCY_RATES[from,to]*amount)
+	return(ifelse(CURRENCY_RATES[from,to]>0.0,CURRENCY_RATES[from,to]*amount),NA)
 }
 
 show_account_status <- function() {
@@ -80,9 +89,9 @@ main_menu_yes_no <- function(ret_y,ret_n) {
 # Register Account Name
 state1 <- function() {
 	# Reset and prompt for new account Name
-	ACCOUNT_NAME<<-NULL
-	ACCOUNT_BALANCE<<-100.0
-	ACCOUNT_CURRENCY<<-CURRENCIES[1]
+	ACCOUNT_NAME<<-DEFAULT_ACCOUNT_NAME
+	ACCOUNT_BALANCE<<-DEFAULT_ACCOUNT_BALANCE
+	ACCOUNT_CURRENCY<<-DEFAULT_ACCOUNT_CURRENCY
 	while (is.null(ACCOUNT_NAME))
 		ACCOUNT_NAME<<-prompter("Set a valid account name: ")
 	printer(paste(sep="","Account name has been set to '",ACCOUNT_NAME,"'.\n"))
@@ -101,12 +110,12 @@ state2 <- function() {
 		last_balance<-ACCOUNT_BALANCE
 		deposit<-NA
 		while (is.na(deposit)||deposit<0.0) {
-			deposit<-as.numeric(prompter(paste(sep="",
+			deposit<-force_numeric(prompter(paste(sep="",
 				"\n",
 				"Specify deposit amount. Specify zero to return to main menu.",
 				"\n>>>"
 			)))
-			if (deposit==0.0)
+			if (!is.na(deposit)&&deposit==0.0)
 				return(0)
 		}
 		# Add to balance and inform
@@ -134,12 +143,12 @@ state3 <- function() {
 		last_balance<-ACCOUNT_BALANCE
 		withdraw<-NA
 		while (is.na(withdraw)||withdraw<0.0||withdraw>last_balance) {
-			withdraw<-as.numeric(prompter(paste(sep="",
+			withdraw<-force_numeric(prompter(paste(sep="",
 				"\n",
 				"Specify withdraw amount. Specify zero to return to main menu.",
 				"\n>>>"
 			)))
-			if (withdraw==0.0)
+			if (!is.na(withdraw)&&withdraw==0.0)
 				return(0)
 		}
 		# Subtract from balance and inform
@@ -190,7 +199,7 @@ state4 <- function() {
 		" is ",sprintf("%.4f",CURRENCY_RATES[digit_from,digit_to]),".\n"
 	))
 	while (is.na(from_amount)) {
-		from_amount<-as.numeric(prompter(paste(sep="",
+		from_amount<-force_numeric(prompter(paste(sep="",
 			"\nEnter the amount of ",CURRENCIES[digit_from],
 			" to convert to ",CURRENCIES[digit_to],": "
 		)))
@@ -231,7 +240,7 @@ state5 <- function() {
 			" is ",sprintf("%.4f",CURRENCY_RATES[digit_from,digit_to]),".\n"
 		))
 	while (is.na(rate)||rate<0.0) {
-		rate<-as.numeric(prompter(paste(sep="",
+		rate<-force_numeric(prompter(paste(sep="",
 			"Assign a ",ifelse(CURRENCY_RATES[digit_to,digit_from]==0.0,"new rate","rate")," from ",
 			CURRENCIES[digit_from]," to ",CURRENCIES[digit_to],". Assign zero to abort.",
 			"\n>>>"
@@ -272,7 +281,7 @@ state6 <- function() {
 			if (toupper(days)=="END"||days==0)
 				return(0)
 			else
-				days<-as.numeric(days)
+				days<-force_numeric(days)
 		}
 		printer("\n")
 		# Compute per-day interests
@@ -324,7 +333,7 @@ state6 <- function() {
 # Screen state transferer
 runState <- function(state=0) {
 	if (state==0) {
-		prompt_ret<-as.numeric(prompter(paste(sep="",
+		prompt_ret<-force_numeric(prompter(paste(sep="",
 			"\n",
 			"Select transaction:\n",
 			"[1] Register Account Name\n",
@@ -346,7 +355,7 @@ runState <- function(state=0) {
 		else
 			return(0)
 	} else {
-		return(switch(as.numeric(state),
+		return(switch(force_numeric(state),
 			state1(),
 			state2(),
 			state3(),
@@ -358,7 +367,7 @@ runState <- function(state=0) {
 }
 
 main <- function() {
-	state<-0;
+	state<-0
 	while (state!=-1) {
 		state<-runState(state)
 	}
