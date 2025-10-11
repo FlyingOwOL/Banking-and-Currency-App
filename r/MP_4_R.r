@@ -2,11 +2,6 @@
 CURRENCIES<-c("PHP","USD","JPY","GBP","EUR","CNY")
 CURRENCY_RATES<-array(0.0,dim=c(length(CURRENCIES),length(CURRENCIES)))
 
-# Defaults
-DEFAULT_ACCOUNT_NAME<-NULL
-DEFAULT_ACCOUNT_BALANCE<-0.0
-DEFAULT_ACCOUNT_CURRENCY<-CURRENCIES[1]
-
 # User
 ACCOUNT_NAME<-NULL
 ACCOUNT_BALANCE<-0.0
@@ -57,7 +52,7 @@ currency_selector <- function(header_text) {
 }
 
 currency_converter <- function(amount,from,to) {
-	return(ifelse(CURRENCY_RATES[from,to]>0.0,CURRENCY_RATES[from,to]*amount),NA)
+	return(ifelse(CURRENCY_RATES[from,to]==0.0,NA,CURRENCY_RATES[from,to]*amount))
 }
 
 show_account_status <- function() {
@@ -88,13 +83,13 @@ main_menu_yes_no <- function(ret_y,ret_n) {
 
 # Register Account Name
 state1 <- function() {
-	# Reset and prompt for new account Name
-	ACCOUNT_NAME<<-DEFAULT_ACCOUNT_NAME
-	ACCOUNT_BALANCE<<-DEFAULT_ACCOUNT_BALANCE
-	ACCOUNT_CURRENCY<<-DEFAULT_ACCOUNT_CURRENCY
-	while (is.null(ACCOUNT_NAME))
-		ACCOUNT_NAME<<-prompter("Set a valid account name: ")
-	printer(paste(sep="","Account name has been set to '",ACCOUNT_NAME,"'.\n"))
+	if (!is.null(ACCOUNT_NAME)) {
+		printer("You can only register an account once. Restart to change account.\n")
+	} else {
+		while (is.null(ACCOUNT_NAME)||nchar(trimws(ACCOUNT_NAME))==0)
+			ACCOUNT_NAME<<-prompter("Set a valid account name: ")
+		printer(paste(sep="","Account name has been set to '",ACCOUNT_NAME,"'.\n"))
+	}
 	# Prompt for return
 	return(main_menu_yes_no(0,1))
 }
@@ -103,7 +98,6 @@ state1 <- function() {
 state2 <- function() {
 	if (is.null(ACCOUNT_NAME)) {
 		printer("\nPlease register account first to enable withdraw/deposit/interest computation.")
-		return(0)
 	} else {
 		show_account_status()
 		# Prompt for amount
@@ -136,7 +130,6 @@ state2 <- function() {
 state3 <- function() {
 	if (is.null(ACCOUNT_NAME)) {
 		printer("\nPlease register account first to enable withdraw/deposit/interest computation.")
-		return(0)
 	} else {
 		show_account_status()
 		# Prompt for amount
@@ -265,7 +258,6 @@ state5 <- function() {
 state6 <- function() {
 	if (is.null(ACCOUNT_NAME)) {
 		printer("\nPlease register account first to enable withdraw/deposit/interest computation.")
-		return(0)
 	} else {
 		show_account_status()
 		# Prompt for number of days
