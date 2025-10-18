@@ -6,25 +6,28 @@ export function mainMenu(){
     [3] Withdraw Amount 
     [4] Currency Exchange 
     [5] Record Exchange Rates 
-    [6] Show Interest Computation`);
+    [6] Show Interest Computation
+    [7] Exit Program`);
+}
+export function backToMainMenu(){
+    console.log("Back to the Main Menu (Y/N): ");
 }
 
 export function registerAccountName(lastName, firstName){
     console.log(
     `Register Account Name 
-    Account Name: ${lastName}, ${firstName}  
-    Back to the Main Menu (Y/N):`);
+    Account Name: ${lastName}, ${firstName}`);
 }
 
-export function depositAndWithdrawAmount(transactionType, accountName){
+export function depositOrWithdrawAmount(transactionType, accountName, amount, balance){
     console.log(
     `${transactionType} Amount 
     Account Name: ${accountName} 
-    Current Balance: 1000.00 
+    Current Balance: ${format(balance - amount, 2)} 
     Currency: PHP 
     
-    ${transactionType} Amount: 500.00 
-    Updated Balance: 1500.00 
+    ${transactionType} Amount: ${format(amount, 2)} 
+    Updated Balance: ${format(balance, 2)} 
     
     Back to the Main Menu (Y/N):`);
 }
