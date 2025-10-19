@@ -1,4 +1,4 @@
-export function mainMenu(to = 0){
+export function mainMenu(){
     console.log(
     `Select Transaction: 
 [1] Register Account Name 
