@@ -17,11 +17,11 @@ export function mainMenu(){
 function displayCurrencies(){
     const currencyChoices =
     `[1] Philippine Peso (PHP) 
-    [2] United States Dollar (USD) 
-    [3] Japanese Yen (JPY) 
-    [4] British Pound Sterling (GBP) 
-    [5] Euro (EUR) 
-    [6] Chinese Yuan Renminni (CNY)`;
+[2] United States Dollar (USD) 
+[3] Japanese Yen (JPY) 
+[4] British Pound Sterling (GBP) 
+[5] Euro (EUR) 
+[6] Chinese Yuan Renminni (CNY)`;
     return currencyChoices;
 }
 
@@ -29,12 +29,7 @@ export function recordExchangeRates(){
     console.log(
     `Record Exchange Rate
 
-    ${displayCurrencies()}
-    
-    Select Foreign Currency: [2] 
-    Exchange Rate: 52.00 
-    
-    Back to the Main Menu (Y/N): `);
+${displayCurrencies()}\n`);
 } 
  
 /**
@@ -51,7 +46,7 @@ function sourceCurrencyDisplay(){
 
 export function currencyExchange(){
     console.log(
-    `${sourceCurrencyDisplay()}
+`${sourceCurrencyDisplay()}
 
 Source Currency: [2] 
 Source Amount: 100.00

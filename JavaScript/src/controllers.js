@@ -22,53 +22,102 @@ export function registerAccount(){
     return account;
 }
 
-function format(number, decimalPlaces){
+function format(number,   
+                decimalPlaces){
     return number.toFixed(decimalPlaces);
 }
 
-export function depositOrWithdrawAmount(transactionType, accountName, amount, balance){
+function depositOrWithdrawAmount(transactionType, 
+                                 accountName, 
+                                 balance){
     console.log(
     `${transactionType} Amount 
-    Account Name: ${accountName} 
-    Current Balance: ${format(balance - amount, 2)} 
-    Currency: PHP 
-    
-    ${transactionType} Amount: ${format(amount, 2)} 
-    Updated Balance: ${format(balance, 2)} 
-    
-    Back to the Main Menu (Y/N):`);
+Account Name: ${accountName} 
+Current Balance: ${format(balance, 2)} 
+Currency: PHP\n`);
 }
 
-export function depositToAccount(account){ //implicitly typed as a account object
+export function depositToAccount(account){ 
     let amount = 0;
+    let isDone = false;
+    let userChoice;
     do{
-        try{
-            amount = Number(prompt("Enter amount to deposit: "));
-            if (amount > 0){
-                account.deposit(amount);
-                display.depositOrWithdrawAmount("Deposit", account.getAccountName, amount);
-            } else {
-                console.log("Amount must be greater than 0.");
+        do{
+            depositOrWithdrawAmount("Deposit", 
+                                    account.getAccountName, 
+                                    account.getBalance);
+            try{
+                amount = prompt("Deposit Amount: ");
+
+                if (amount.includes('.') == false){
+                    console.log("Amount must have a decimal.");
+                } else if (parseFloat(amount) > 0){
+                    account.deposit(parseFloat(amount));
+                    console.log(`Updated Balance: ${format(account.getBalance, 2)}\n\n`);
+                    isDone = true;
+                } else {
+                    console.log("Amount must be greater than 0.");
+                }
+            }catch (error){
+                console.log("An error occurred: " + error);     
             }
-        }catch (error){
-            console.log("An error occurred: " + error);
-        }
-    } while(isNaN(amount) || amount <= 0);
+        } while(!isDone);        
+        userChoice = prompt("Back to the Main Menu (Y/N): ");
+        isDone = false;
+    } while(userChoice.toLowerCase() != 'y');
 }
 
 export function withdrawFromAccount(account){ //implicitly typed as a account object
     let amount = 0;
+    let isDone = false;
+    let userChoice;
     do{
-        try{
-            amount = Number(prompt("Enter amount to withdraw: "));
-            if (amount > 0 && amount <= account.getBalance){
-                account.withdraw(amount);
-                display.depositOrWithdrawAmount("Withdraw", account.getAccountName, amount);
-            } else {
-                console.log("Amount must be greater than 0 and less than or equal to current balance.");
+        do{
+            depositOrWithdrawAmount("Withdraw", 
+                                    account.getAccountName, 
+                                    account.getBalance);
+            try{
+                amount = prompt("Withdraw Amount: ");
+                let parseAmount = parseFloat(amount);
+                if (amount.includes('.') == false){
+                    console.log("Amount must have a decimal.");
+                } else if (parseAmount > 0 && parseAmount <= account.getBalance){
+                    account.withdraw(parseAmount);
+                    console.log(`Updated Balance: ${format(account.getBalance, 2)}\n\n`);
+                    isDone = true;
+                } else {
+                    console.log("Amount must be greater than 0 and less than or equal to current balance.");
+                }
+            }catch (error){
+                console.log("An error occurred: " + error);
             }
-        }catch (error){
-            console.log("An error occurred: " + error);
+        } while(!isDone);
+        userChoice = prompt("Back to the Main Menu (Y/N): ");
+        isDone = false;
+
+        if (account.getBalance == 0){ //force exit if balance is 0
+            console.log("Balance is 0. Returning to Main Menu.");
+            isDone = true;
         }
-    } while(isNaN(amount) || amount <= 0 || amount > account.getBalance);
+    }while(userChoice.toLowerCase() != 'y' && !isDone);
+}
+
+export function recordExchangeRates(){
+    let num;
+    let userChoice = 'n';
+    do{
+        display.recordExchangeRates();
+        num = Number(prompt("Select Foreign Currency: "));
+        if (num > 0 && num < 7){
+            console.log(`Exchange Rate: ${format(parseFloat(model.exchangeRate[num - 1]), 2)}\n`);
+
+            userChoice = prompt("Back to the Main Menu (Y/N): ");
+        } else {
+            console.log("Invalid choice. Please select a number from 1-6.");
+        }
+    } while(userChoice.toLowerCase() != 'y');
+}
+
+export function currencyExchange(){
+    display.currencyExchange();
 }

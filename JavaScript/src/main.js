@@ -18,11 +18,14 @@ do{
                 controller.depositToAccount(accounts);
                 break;
             case 3:
-
+                accounts.getBalance > 0 ? controller.withdrawFromAccount(accounts) : 
+                                          console.log("Insufficient balance to withdraw amount. Please deposit first.");
                 break;
             case 4:
+                controller.currencyExchange();
                 break;
             case 5:
+                controller.recordExchangeRates();
                 break;
             case 6:
                 break;

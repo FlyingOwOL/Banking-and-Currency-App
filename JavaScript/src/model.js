@@ -1,5 +1,6 @@
 // Follow Java OOP conventions to simplify my life ffs
 
+// Define Account class
 export class account {
     accountName;
     balance;
@@ -28,3 +29,7 @@ export class account {
         this.balance -= amount;
     }
 };
+
+
+// Fixed exchange rates
+export const exchangeRate = [1.00, 52.00, 0.47, 70.00, 58.00, 8.00]; // PHP to USD, JPY, GBP, EUR, CNY
