@@ -18,6 +18,8 @@ build/
 # VS Code settings (keep your personal prefs out of the repo)
 .vscode/
 .idea/
+package-lock.json
+package.json
 
 # Temporary files
 *.tmp
