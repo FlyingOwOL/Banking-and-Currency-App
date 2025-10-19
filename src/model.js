@@ -1,17 +1,15 @@
 // Follow Java OOP conventions to simplify my life ffs
 
 export class account {
-    firstName;
-    lastName;
     accountName;
     balance;
+    currency;
 
     // Constructor for new accounts
-    constructor(lastName, firstName, amount = 0){
-        this.accountName = lastName + ", " + firstName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.balance = amount;
+    constructor(accountName){
+        this.accountName = accountName;
+        this.balance = 0;
+        this.currency = 'PHP';
     }
 
     // getters
@@ -20,12 +18,6 @@ export class account {
     }
     get getBalance(){
         return this.balance;
-    }
-    get getFirstName(){
-        return this.firstName;
-    }
-    get getLastName(){
-        return this.lastName;
     }
 
     // methods

@@ -1,35 +1,13 @@
-export function mainMenu(){
+export function mainMenu(to = 0){
     console.log(
     `Select Transaction: 
-    [1] Register Account Name 
-    [2] Deposit Amount 
-    [3] Withdraw Amount 
-    [4] Currency Exchange 
-    [5] Record Exchange Rates 
-    [6] Show Interest Computation
-    [7] Exit Program`);
-}
-export function backToMainMenu(){
-    console.log("Back to the Main Menu (Y/N): ");
-}
-
-export function registerAccountName(lastName, firstName){
-    console.log(
-    `Register Account Name 
-    Account Name: ${lastName}, ${firstName}`);
-}
-
-export function depositOrWithdrawAmount(transactionType, accountName, amount, balance){
-    console.log(
-    `${transactionType} Amount 
-    Account Name: ${accountName} 
-    Current Balance: ${format(balance - amount, 2)} 
-    Currency: PHP 
-    
-    ${transactionType} Amount: ${format(amount, 2)} 
-    Updated Balance: ${format(balance, 2)} 
-    
-    Back to the Main Menu (Y/N):`);
+[1] Register Account Name 
+[2] Deposit Amount 
+[3] Withdraw Amount 
+[4] Currency Exchange 
+[5] Record Exchange Rates 
+[6] Show Interest Computation
+[7] Exit Program`);
 }
 
 /**

@@ -1,5 +1,43 @@
 import * as display from "./display_choices.js";
 import * as model from "./model.js";
+import { prompt } from "./main.js";
+
+export function registerAccount(){
+    let account;
+    let userChoice;
+    userChoice = Number(prompt("Enter your choice (1-7): "));
+    if (userChoice == 1){
+        console.log('Register Account Name');
+        let accountName = prompt('Account Name:');
+        account = new model.account(accountName);
+        do{
+            userChoice = prompt("Back to the Main Menu (Y/N): ");
+            if (userChoice.toLowerCase() == 'n'){
+                console.log("Account already registered. Go back to Main Menu.");
+            }
+        } while(userChoice.toLowerCase() != 'y');            
+    } else {
+        console.log("No account registered. Please register an account first.");
+    }
+    return account;
+}
+
+function format(number, decimalPlaces){
+    return number.toFixed(decimalPlaces);
+}
+
+export function depositOrWithdrawAmount(transactionType, accountName, amount, balance){
+    console.log(
+    `${transactionType} Amount 
+    Account Name: ${accountName} 
+    Current Balance: ${format(balance - amount, 2)} 
+    Currency: PHP 
+    
+    ${transactionType} Amount: ${format(amount, 2)} 
+    Updated Balance: ${format(balance, 2)} 
+    
+    Back to the Main Menu (Y/N):`);
+}
 
 export function depositToAccount(account){ //implicitly typed as a account object
     let amount = 0;
