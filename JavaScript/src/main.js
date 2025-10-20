@@ -3,8 +3,10 @@ export const prompt = promptSync();
 
 import * as display from "./display_choices.js";
 import * as controller from "./controllers.js";
+import * as model from "./model.js";
 
 let accounts;
+const currency = new model.currency();
 let userChoice;
 do{
     display.mainMenu();
@@ -22,10 +24,10 @@ do{
                                           console.log("Insufficient balance to withdraw amount. Please deposit first.");
                 break;
             case 4:
-                controller.currencyExchange();
+                controller.currencyExchange(currency);
                 break;
             case 5:
-                controller.recordExchangeRates();
+                controller.recordExchangeRates(currency);
                 break;
             case 6:
                 break;

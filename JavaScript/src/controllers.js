@@ -102,20 +102,65 @@ export function withdrawFromAccount(account){ //implicitly typed as a account ob
     }while(userChoice.toLowerCase() != 'y' && !isDone);
 }
 
-export function recordExchangeRates(){
-    let num;
-    let userChoice = 'n';
+export function recordExchangeRates(currencyObject){
+    let currency = null;
+    let returnToMain = 'n';
+    let stringRate = null;
+    let savedRate = 0;
+    let isSuccessful = false;
     do{
-        display.recordExchangeRates();
-        num = Number(prompt("Select Foreign Currency: "));
-        if (num > 0 && num < 7){
-            console.log(`Exchange Rate: ${format(parseFloat(model.exchangeRate[num - 1]), 2)}\n`);
+        
+        if(currency == null){
 
-            userChoice = prompt("Back to the Main Menu (Y/N): ");
+            display.recordExchangeRates();
+            currency = Number(prompt("Select Foreign Currency: "));
+
+            if (currencyObject.exchangeRate[currency - 1] > 0) {
+
+                console.log(`${currencyObject.countryCode[currency - 1]} already has a record.\n`);
+                currency = null;  // Reset to prompt again
+            }
+        } 
+
+        if (currency > 1 && currency < 7){
+
+            stringRate = prompt("Exchange Rate: ");
+        } else if (currency == 1){
+            console.log("PHP is the base currency and cannot have an exchange rate.\n");
+            currency = null; 
         } else {
-            console.log("Invalid choice. Please select a number from 1-6.");
+            console.log("Invalid choice. Please select a number from 1-6.\n");
+            currency = null;
         }
-    } while(userChoice.toLowerCase() != 'y');
+
+        if (currency != null && !stringRate.includes('.')){
+
+            console.log("Exchange rate must have a decimal and be greater than or equal to 0.\n");
+            stringRate = null;
+        } else if (currency != null && 
+                   parseFloat(stringRate) >= 0){
+
+            currencyObject.exchangeRate[currency - 1] = parseFloat(stringRate); //set recorded rate
+            savedRate = currencyObject.exchangeRate[currency - 1]; //saved recorded rate
+        } else if(currency != null){
+
+            console.log("Exchange rate must be greater than 0.\n");
+            stringRate = null;
+        }
+
+        if (currency != null && //valid currency selected
+            stringRate != null){  //exchange rate recorded   
+
+            isSuccessful = true; 
+            returnToMain = prompt("\nBack to the Main Menu (Y/N): ");
+        }
+
+        if (isSuccessful && returnToMain.toLowerCase() != 'y'){
+            currency = null; //reset currency selection
+            stringRate = null; //reset exchange rate input
+            isSuccessful = false;
+        }
+    } while(returnToMain.toLowerCase() != 'y');
 }
 
 export function currencyExchange(){

@@ -31,5 +31,13 @@ export class account {
 };
 
 
-// Fixed exchange rates
-export const exchangeRate = [1.00, 52.00, 0.47, 70.00, 58.00, 8.00]; // PHP to USD, JPY, GBP, EUR, CNY
+// Define Currency class
+export class currency {
+    exchangeRate; 
+    countryCode;
+
+    constructor(){
+        this.exchangeRate = [0, 0, 0, 0, 0, 0]; // PHP to [PHP, USD, JPY, GBP, EUR, CNY]
+        this.countryCode = ['PHP', 'USD', 'JPY', 'GBP', 'EUR', 'CNY'];
+    }
+};
