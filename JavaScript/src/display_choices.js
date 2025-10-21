@@ -1,3 +1,7 @@
+export function spacing(){
+    console.log("\n\n\n");
+}
+
 export function mainMenu(){
     console.log(
     `Select Transaction: 
@@ -36,39 +40,16 @@ ${displayCurrencies()}\n`);
  * Used on the first half of the currency exchange display
  * @returns {string} source currency display to polarize in logger
  */
-function sourceCurrencyDisplay(){
-    const sourceCurrency =
-    `Foreign Currency Exchange
-    Source Currency Option:
-    ${displayCurrencies()}`;
-    return sourceCurrency
-}
-
-export function currencyExchange(){
+export function sourceCurrencyDisplay(){
     console.log(
-`${sourceCurrencyDisplay()}
-
-Source Currency: [2] 
-Source Amount: 100.00
-
-Exchanged Currency Options:
-    ${displayCurrencies()}
-    
-Exchanged Currency: [1]
-Exchanged Amount: 5200.00
-
-Convert another currency (Y/N)?: `);
+    `Foreign Currency Exchange\nSource Currency Option:\n${displayCurrencies()}\n`);
 }
 
-export function interestAmount(accountName, balance, currency, interestRate, totalDays){
+export function interestAmount(accountName, balance, currency, interestRate){
     console.log(
     `Show Interest Amount 
-    Account Name: ${accountName} 
-    Current Balance: ${balance} 
-    Currency: ${currency} 
-    Interest Rate: ${interestRate}% 
-
-    Total Number of Days: ${totalDays}
-    
-    Back to the Main Menu (Y/N): `);
+Account Name: ${accountName} 
+Current Balance: ${balance} 
+Currency: ${currency} 
+Interest Rate: ${interestRate * 100}%`);
 }

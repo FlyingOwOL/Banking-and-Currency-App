@@ -5,12 +5,14 @@ export class account {
     accountName;
     balance;
     currency;
+    annualInterestRate;
 
     // Constructor for new accounts
     constructor(accountName){
         this.accountName = accountName;
         this.balance = 0;
         this.currency = 'PHP';
+        this.annualInterestRate = 0.05; // 5% default annual interest rate
     }
 
     // getters
@@ -20,13 +22,11 @@ export class account {
     get getBalance(){
         return this.balance;
     }
-
-    // methods
-    deposit(amount){
-        this.balance += amount;
+    get getCurrency(){
+        return this.currency;
     }
-    withdraw(amount){
-        this.balance -= amount;
+    get annualInterestRate(){
+        return this.annualInterestRate;
     }
 };
 
@@ -37,7 +37,7 @@ export class currency {
     countryCode;
 
     constructor(){
-        this.exchangeRate = [0, 0, 0, 0, 0, 0]; // PHP to [PHP, USD, JPY, GBP, EUR, CNY]
+        this.exchangeRate = [1, 0, 0, 0, 0, 0]; // PHP to [PHP, USD, JPY, GBP, EUR, CNY]
         this.countryCode = ['PHP', 'USD', 'JPY', 'GBP', 'EUR', 'CNY'];
     }
 };

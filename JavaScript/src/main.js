@@ -10,35 +10,61 @@ const currency = new model.currency();
 let userChoice;
 do{
     display.mainMenu();
-    if (accounts != null){
-        userChoice = Number(prompt("Enter your choice (1-7): "));
-        switch(userChoice){
-            case 1:
-                console.log("Action denied. Account already registered. Go back to Main Menu.");
-                break;
-            case 2:
-                controller.depositToAccount(accounts);
-                break;
-            case 3:
-                accounts.getBalance > 0 ? controller.withdrawFromAccount(accounts) : 
-                                          console.log("Insufficient balance to withdraw amount. Please deposit first.");
-                break;
-            case 4:
-                controller.currencyExchange(currency);
-                break;
-            case 5:
-                controller.recordExchangeRates(currency);
-                break;
-            case 6:
-                break;
-            case 7:
-                console.log("Exiting program. Goodbye!");
-                break;
-            default:  
-                console.log("Invalid choice. Please select a number from 1-7."); 
-                break;
-        }
-    } else {
+
+    userChoice = Number(prompt("Enter your choice (1-7): "));
+    if (accounts == null && userChoice == 1){
+        display.spacing(); 
         accounts = controller.registerAccount();
+        display.spacing();
+        continue;
+    } else if (accounts == null && 
+               (userChoice == 2 ||  //can't deposit
+                userChoice == 3 ||  //can't withdraw
+                userChoice == 6)){  //can't show interest
+
+        console.log("No account registered. Please register an account first.\n");
+        continue;
+    }
+    switch(userChoice){
+        case 1:
+            display.spacing();
+            console.log("Action denied. Account already registered. Go back to Main Menu.\n");
+            display.spacing();
+            break;
+        case 2:
+            display.spacing();
+            controller.depositToAccount(accounts);
+            display.spacing();
+            break;
+        case 3:
+            display.spacing();
+            controller.withdrawFromAccount(accounts);
+            display.spacing();
+            break;
+        case 4:
+            display.spacing();
+            controller.currencyExchange(currency);
+            display.spacing();
+            break;
+        case 5:
+            display.spacing();
+            controller.recordExchangeRates(currency);
+            display.spacing();
+            break;
+        case 6:
+            display.spacing();
+            controller.showInterestComputation(accounts);
+            display.spacing();
+            break;
+        case 7:
+            display.spacing();
+            console.log("Exiting program. Goodbye!");
+            display.spacing();
+            break;
+        default:  
+            display.spacing();
+            console.log("Invalid choice. Please select a number from 1-7.\n"); 
+            display.spacing();
+            break;
     }
 } while(userChoice != 7);
