@@ -75,7 +75,7 @@ fun main() {
                     println("Exchanged Currency Options: ")
                     displayCurrencyMenu()
                     val selectedDestConversion = conversionRates.getOrNull(askValidCurrency() - 1)
-                    if (selectedSourceConversion == selectedDestConversion) println("Conversion is successful, but the amount is the same because you selected the same currency")
+                    if (selectedSourceConversion == selectedDestConversion) println("\nConversion is successful, but the amount is the same because you selected the same currency.\n")
                     val destAmount = exchangeCurrencyValidation(selectedSourceConversion, selectedDestConversion, sourceAmount)
                     println("Exchanged Amount: ${destAmount.formatDecimal(2)}")
                     willContinue = askToProceedMainMenu()
