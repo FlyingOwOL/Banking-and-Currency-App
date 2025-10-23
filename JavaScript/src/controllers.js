@@ -4,14 +4,18 @@ import { prompt } from "./main.js";
 
 export function registerAccount(){
     let account;
-    let userChoice;
+    let userChoice = 'n';
     let accountName 
-    
-    console.log('Register Account Name');
-    accountName = prompt('Account Name:');
-    console.log('');
+
     account = new model.account(accountName);
     do{
+        console.log('Register Account Name');
+        accountName = prompt('Account Name:');
+        console.log('');
+        if (accountName.trim() === ''){  //if the name is blank, repeat
+            console.log("Account name cannot be blank");
+            continue;
+        }
         userChoice = prompt("Back to the Main Menu (Y/N): ");
         if (userChoice.toLowerCase() == 'n'){
             console.log("Account already registered. Go back to Main Menu.\n");
