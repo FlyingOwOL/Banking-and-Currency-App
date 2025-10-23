@@ -175,7 +175,9 @@ state4 <- function() {
 	}
 	
 	# Check if there is a conversion record
-	if (is.na(currency_converter(1,digit_from,digit_to))) {
+	a_to_php<-currency_converter(1,digit_from,1)
+	php_to_b<-currency_converter(a_to_php,1,digit_to)
+	if (is.na(a_to_php)||is.na(php_to_b)) {
 		printer(paste(sep="",
 			"There is no conversion rate assigned for ",
 			CURRENCIES[digit_from]," to ",CURRENCIES[digit_to]," yet.\n",
@@ -189,7 +191,7 @@ state4 <- function() {
 	from_amount<-NA
 	printer(paste(sep="",
 		"The current rate from ",CURRENCIES[digit_from]," to ",CURRENCIES[digit_to],
-		" is ",sprintf("%.4f",CURRENCY_RATES[digit_from,digit_to]),".\n"
+		" is ",sprintf("%.4f",php_to_b),".\n"
 	))
 	while (is.na(from_amount)) {
 		from_amount<-force_numeric(prompter(paste(sep="",
@@ -201,7 +203,7 @@ state4 <- function() {
 	# Print results
 	printer(paste(sep="",
 		from_amount," ",CURRENCIES[digit_from]," is equivalent to ",
-		currency_converter(from_amount,digit_from,digit_to)," ",CURRENCIES[digit_to],".\n"
+		sprintf("%.4f",php_to_b*from_amount)," ",CURRENCIES[digit_to],".\n"
 	))
 	
 	# Prompt for return
@@ -211,18 +213,12 @@ state4 <- function() {
 # Record Exchange Rates
 state5 <- function() {
 	# Prompt user-desired conversion
-	digit_from<-currency_selector("Choose what currency to convert from:")
-	if (digit_from==0)
-		return(digit_from)
-	
-	digit_to<-digit_from
+	digit_to<-1
+	digit_from<-1
 	while (digit_to==digit_from) {
-		digit_to<-currency_selector(paste(sep="",
-			"Choose what currency to convert to, except for ",
-			digit_from,") ",CURRENCIES[digit_from],":"
-		))
-		if (digit_to==0)
-			return(digit_to)
+		digit_from<-currency_selector("From PHP to...")
+		if (digit_from==0)
+			return(digit_from)
 	}
 	
 	# Assign rate
@@ -243,8 +239,8 @@ state5 <- function() {
 	}
 	
 	# Change rates to and back, then print completion.
-	CURRENCY_RATES[digit_from,digit_to]<<-rate
-	CURRENCY_RATES[digit_to,digit_from]<<-rate^(-1)
+	CURRENCY_RATES[digit_from,digit_to]<<-(rate)
+	CURRENCY_RATES[digit_to,digit_from]<<-(rate^(-1))	
 	printer(paste(sep="",
 		"Currency exchange for ",CURRENCIES[digit_from]," and ",CURRENCIES[digit_to],
 		" has been updated.\n"
@@ -359,6 +355,7 @@ runState <- function(state=0) {
 }
 
 main <- function() {
+	CURRENCY_RATES[1,1]<<-1.0
 	state<-0
 	while (state!=-1) {
 		state<-runState(state)
