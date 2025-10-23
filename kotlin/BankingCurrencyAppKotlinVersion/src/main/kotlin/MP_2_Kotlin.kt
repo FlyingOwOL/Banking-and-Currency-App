@@ -67,14 +67,15 @@ fun main() {
                 //make sure that the selected conversion rates are not zero
                 do {
                     println("--| Currency Exchange |--")
-                    println("Select Currency Option: ")
+                    println("Source Currency Options: ")
                     displayCurrencyMenu()
-                    print("\nSelect Source Currency: ")
                     val selectedSourceConversion = conversionRates.getOrNull(askValidCurrency() - 1)
                     val sourceAmount = askValidAmount("Source amount: ")
+                    print("\n")
                     println("Exchanged Currency Options: ")
                     displayCurrencyMenu()
                     val selectedDestConversion = conversionRates.getOrNull(askValidCurrency() - 1)
+                    if (selectedSourceConversion == selectedDestConversion) println("Conversion is successful, but the amount is the same because you selected the same currency")
                     val destAmount = exchangeCurrencyValidation(selectedSourceConversion, selectedDestConversion, sourceAmount)
                     println("Exchanged Amount: ${destAmount.formatDecimal(2)}")
                     willContinue = askToProceedMainMenu()
@@ -84,7 +85,7 @@ fun main() {
                 do {
                     println("--| Record Exchange Rates |--")
                     displayCurrencyMenu()
-                    print("\nSelect Foreign Currency: ")
+                    println("\nSelect Foreign Currency: ")
                     val currencyChoice = askValidCurrency()
                     val selectedConversion = conversionRates.getOrNull(currencyChoice - 1)
                     setCurrencyRate(selectedConversion)
