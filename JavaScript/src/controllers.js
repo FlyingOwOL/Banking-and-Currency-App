@@ -102,21 +102,9 @@ export function recordExchangeRates(currencyObject){
     let stringRate = null;
     let isSuccessful = false;
     do{
-        if (!currencyObject.exchangeRate.includes(0)){
-            console.log("All currencies have been recorded already.\n");
-            break; // Exit if all currencies are recorded
-        }
-
         if(currency == null){
             display.recordExchangeRates();
-            currency = Number(prompt("Select Foreign Currency: "));
-
-  
-            if (currencyObject.exchangeRate[currency - 1] > 0) {
-                console.log(`${currencyObject.countryCode[currency - 1]} already has a record.\n`);
-                currency = null;  // Reset to prompt again
-                continue;
-            } 
+            currency = Number(prompt("Select Foreign Currency: ")); 
         } 
 
         if (currency > 1 && currency < 7 && 
