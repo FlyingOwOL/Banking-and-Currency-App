@@ -5,15 +5,19 @@ import { prompt } from "./main.js";
 export function registerAccount(){
     let account;
     let userChoice = 'n';
-    let accountName 
+    let accountName = null;
 
     account = new model.account(accountName);
     do{
-        console.log('Register Account Name');
-        accountName = prompt('Account Name:');
-        console.log('');
+        if (accountName == null){
+            console.log('Register Account Name');
+            accountName = prompt('Account Name:');
+            console.log('');            
+        }
+
         if (accountName.trim() === ''){  //if the name is blank, repeat
-            console.log("Account name cannot be blank");
+            console.log("Account name cannot be blank\n");
+            accountName = null;
             continue;
         }
         userChoice = prompt("Back to the Main Menu (Y/N): ");
@@ -46,64 +50,89 @@ Currency: PHP\n`);
 }
 
 export function depositToAccount(account){ 
-    let amount = 0;
+    let amount = null;
     let userChoice = 'n';
+    let isSuccessful = true;;
     do{
         depositOrWithdrawAmount("Deposit", 
                                 account.getAccountName, 
                                 account.balance);
     
-        amount = prompt("Deposit Amount: ");
+         if (amount == null){
+            amount = prompt("Deposit Amount: ");
+         }
 
         if (!amount.includes('.')){
             console.log("Amount must have a decimal.\n");
+            amount = null;
             continue;
         } else if (amount <= 0){
             console.log("Amount must be greater than 0.\n");
+            amount = null;
             continue;
         }
 
-        account.balance += parseFloat(amount);
-        console.log(`Updated Balance: ${format(account.balance, 2, 0)}\n\n`);
+        if (isSuccessful){
+            account.balance += parseFloat(amount);
+            console.log(`Updated Balance: ${format(account.balance, 2, 0)}\n\n`);            
+        }
 
         userChoice = prompt("Back to the Main Menu (Y/N): ");
-        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
+            isSuccessful = false;
             continue;
+        } else {
+            isSuccessful = true;
+            amount = null;
         }
     } while(userChoice.toLowerCase() != 'y');
 }
 
 export function withdrawFromAccount(account){ //implicitly typed as a account object
-    let amount = 0;
+    let amount = null;
     let userChoice = 'n';
     let parseAmount;
+    let isSuccessful = true;
     do{
         depositOrWithdrawAmount("Withdraw", 
                                 account.getAccountName, 
                                 account.balance);
-
-        amount = prompt("Withdraw Amount: ");
-        parseAmount = parseFloat(amount);
+        
+        if (amount == null){
+            amount = prompt("Withdraw Amount: ");
+            parseAmount = parseFloat(amount);
+        }
+       
         // if one of the conditions are met, skip current iteration
         if (!amount.includes('.')){
             console.log("Amount must have a decimal.\n");
+            amount = null;
             continue;
         } else if (parseAmount < 0){
             console.log("Amount must be greater than 0.\n");
+            amount = null;
             continue;
         } else if (parseAmount > account.balance){
             console.log("Amount must be less than the current balance.\n");
+            amount = null;
             continue;
         }
 
-        account.balance -= parseAmount;
-        console.log(`Updated Balance: ${format(account.balance, 2, 0)}\n\n`);
+        if (isSuccessful){
+            account.balance -= parseAmount;
+            console.log(`Updated Balance: ${format(account.balance, 2, 0)}\n\n`);            
+        }
+
 
         userChoice = prompt("Back to the Main Menu (Y/N): ");
-        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
+            isSuccessful = false;
             continue;
+        } else{
+            isSuccessful = true;
+            amount = null;
         }
     }while(userChoice.toLowerCase() != 'y');
 }
@@ -112,7 +141,6 @@ export function recordExchangeRates(currencyObject){
     let currency = null;
     let returnToMain = 'n';
     let stringRate = null;
-    let isSuccessful = false;
     do{
         if(currency == null){
             display.recordExchangeRates();
@@ -140,18 +168,16 @@ export function recordExchangeRates(currencyObject){
             stringRate = null;
             continue;
         }
-   
-        isSuccessful = true;     
+        
         returnToMain = prompt("Back to the Main Menu (Y/N): ");
-        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
             continue;
         }
 
-        if (isSuccessful && returnToMain.toLowerCase() != 'y'){
+        if (returnToMain.toLowerCase() != 'y'){
             currency = null; //reset currency selection
             stringRate = null; //reset exchange rate input
-            isSuccessful = false;
         }
     } while(returnToMain.toLowerCase() != 'y');
 }
@@ -164,6 +190,7 @@ export function currencyExchange(currencyObject){
     let exchangedCurrency = null;
     let exchangedAmount = 0;
     let exchangedRate = 0;
+    let isSuccessful = true;
     do{
         //check if at least 2 exchange rates are recorded if not, refuse user's rights to proceed
         if (currencyObject.exchangeRate.filter(rate => rate > 0).length < 2){ 
@@ -233,16 +260,22 @@ export function currencyExchange(currencyObject){
             continue;
         }
 
-        sourceRate = currencyObject.exchangeRate[selectedCurrency - 1];
-        exchangedRate = currencyObject.exchangeRate[exchangedCurrency - 1];
+        if(isSuccessful){
+            sourceRate = currencyObject.exchangeRate[selectedCurrency - 1];
+            exchangedRate = currencyObject.exchangeRate[exchangedCurrency - 1];
 
-        exchangedAmount = (sourceAmount / exchangedRate) * sourceRate;
-        console.log(`Exchanged Amount: ${format(exchangedAmount, 2, 0)}\n`);
+            exchangedAmount = (sourceAmount / exchangedRate) * sourceRate;
+            console.log(`Exchanged Amount: ${format(exchangedAmount, 2, 0)}\n`);            
+        }
+
          
         repeat = prompt("Convert another currency (Y/N)? . . . ");
-        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
+            isSuccessful = false;
             continue;
+        } else {
+            isSuccessful = true;
         }
         if (repeat.toLowerCase() == 'y'){
 
@@ -255,46 +288,55 @@ export function currencyExchange(currencyObject){
 }
 
 export function showInterestComputation(account){
-    let days = 0;
+    let days = null;
     let returnToMain = 'n';
+    let isSuccessful = true;
     do{
         if(account.getBalance == 0){
             console.log("Balance currently empty. Deposit amount first\n");
             break;
         }
-        
-        display.interestAmount(account.getAccountName,
-                               account.getBalance,
-                               account.getCurrency,
-                               account.annualInterestRate);
-        console.log('');
-        days = prompt("Total Number of Days: ");
-        console.log('');
-    
+        if (days == null){
+            display.interestAmount(account.getAccountName,
+                                account.getBalance,
+                                account.getCurrency,
+                                account.annualInterestRate);
+            console.log('');
+            days = prompt("Total Number of Days: ");
+            console.log('');            
+        }
+
         //If at least one condition is met skip current iteration
         if(days.includes('.')){
             console.log("Number must not have any decimal\n");
+            days = null;
             continue;
         } else if(days <= 0){
             console.log("Days must be more than 0\n");
+            days = null;
             continue;
         }
         
-
-        let interest = 0;
-        let total = account.balance;
-        console.log("Day | Interest | Balance |");
-        for(let i = 0; i < days; i++){
-            interest = computeInterest(total, account.annualInterestRate);
-            total += interest;
-            console.log(`${format(i+1, 0, 3)} | ${format(interest, 2, 0)}     |${format(total, 2, 8)} |`);
+        if(isSuccessful){
+            let interest = 0;
+            let total = account.balance;
+            console.log("Day | Interest | Balance |");
+            for(let i = 0; i < days; i++){
+                interest = computeInterest(total, account.annualInterestRate);
+                total += interest;
+                console.log(`${format(i+1, 0, 3)} | ${format(interest, 2, 0)}     |${format(total, 2, 8)} |`);
+            }
+            console.log('');            
         }
-        console.log('');
+
 
         returnToMain = prompt("Back to the Main Menu(Y/N): ");
-        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
+            isSuccessful = false;
             continue;
+        } else {
+            isSuccessful = true;
         }
     }while (returnToMain.toLowerCase() != 'y');
 }
