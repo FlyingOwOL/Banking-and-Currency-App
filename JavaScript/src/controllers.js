@@ -17,6 +17,10 @@ export function registerAccount(){
             continue;
         }
         userChoice = prompt("Back to the Main Menu (Y/N): ");
+        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+            console.log("Only choose from y or n\n");
+            continue;
+        }
         if (userChoice.toLowerCase() == 'n'){
             console.log("Account already registered. Go back to Main Menu.\n");
         }
@@ -63,6 +67,10 @@ export function depositToAccount(account){
         console.log(`Updated Balance: ${format(account.balance, 2, 0)}\n\n`);
 
         userChoice = prompt("Back to the Main Menu (Y/N): ");
+        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+            console.log("Only choose from y or n\n");
+            continue;
+        }
     } while(userChoice.toLowerCase() != 'y');
 }
 
@@ -93,6 +101,10 @@ export function withdrawFromAccount(account){ //implicitly typed as a account ob
         console.log(`Updated Balance: ${format(account.balance, 2, 0)}\n\n`);
 
         userChoice = prompt("Back to the Main Menu (Y/N): ");
+        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+            console.log("Only choose from y or n\n");
+            continue;
+        }
     }while(userChoice.toLowerCase() != 'y');
 }
 
@@ -131,6 +143,10 @@ export function recordExchangeRates(currencyObject){
    
         isSuccessful = true;     
         returnToMain = prompt("Back to the Main Menu (Y/N): ");
+        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+            console.log("Only choose from y or n\n");
+            continue;
+        }
 
         if (isSuccessful && returnToMain.toLowerCase() != 'y'){
             currency = null; //reset currency selection
@@ -224,7 +240,10 @@ export function currencyExchange(currencyObject){
         console.log(`Exchanged Amount: ${format(exchangedAmount, 2, 0)}\n`);
          
         repeat = prompt("Convert another currency (Y/N)? . . . ");
-        
+        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+            console.log("Only choose from y or n\n");
+            continue;
+        }
         if (repeat.toLowerCase() == 'y'){
 
             selectedCurrency = null; //reset source currency selection
@@ -273,6 +292,10 @@ export function showInterestComputation(account){
         console.log('');
 
         returnToMain = prompt("Back to the Main Menu(Y/N): ");
+        if(userChoice.toLowerCase() != 'n' || userChoice.toLowerCase() != 'y'){
+            console.log("Only choose from y or n\n");
+            continue;
+        }
     }while (returnToMain.toLowerCase() != 'y');
 }
 
