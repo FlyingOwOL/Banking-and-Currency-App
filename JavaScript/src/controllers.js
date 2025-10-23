@@ -67,10 +67,6 @@ export function withdrawFromAccount(account){ //implicitly typed as a account ob
     let userChoice = 'n';
     let parseAmount;
     do{
-        if (account.balance == 0){ //force exit if balance is 0
-            console.log("Balance is 0. Returning to Main Menu.\n");
-            break;
-        }
         depositOrWithdrawAmount("Withdraw", 
                                 account.getAccountName, 
                                 account.balance);
