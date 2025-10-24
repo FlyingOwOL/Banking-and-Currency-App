@@ -88,7 +88,7 @@ fun main() {
                     println("\nSelect Foreign Currency: ")
                     val currencyChoice = askValidCurrency()
                     val selectedConversion = conversionRates.getOrNull(currencyChoice - 1)
-                    setCurrencyRate(selectedConversion)
+                    if (selectedConversion?.source != Currency.PHP)  setCurrencyRate(selectedConversion) else println("You cannot set between convert PHP to PHP")
                     willContinue = askToProceedMainMenu()
                 } while (willContinue == "N")
             }
@@ -230,12 +230,30 @@ class Account(val name: String, val baseCurrency: Currency = Currency.PHP) {
     }
     fun calculateDailyInterest(numDays: Int, annualInterest: BigDecimal) {
         var balanceComputation = balance
-        println("Day | Interest | Balance")
+        val rows = mutableListOf<Triple<String, String, String>>()
+        var maxDayWidth = "Day".length
+        var maxInterestWidth = "Interest".length
+        var maxBalanceWidth = "Balance".length
+
         for (day in 1..numDays) {
             val dailyInterest = balanceComputation * (annualInterest.divide(365.toBigDecimal(), 20, RoundingMode.HALF_UP))
-
             balanceComputation += dailyInterest
-            println("$day | ${dailyInterest.formatDecimal(2)} | ${balanceComputation.formatDecimal(2)}")
+
+            val dayStr = day.toString()
+            val interestStr = dailyInterest.formatDecimal(2)
+            val balanceStr = balanceComputation.formatDecimal(2)
+
+            rows.add(Triple(dayStr, interestStr, balanceStr))
+
+            maxDayWidth = maxOf(maxDayWidth, dayStr.length)
+            maxInterestWidth = maxOf(maxInterestWidth, interestStr.length)
+            maxBalanceWidth = maxOf(maxBalanceWidth, balanceStr.length)
+        }
+
+        // print header and rows with dynamic widths
+        println("${"Day".padStart(maxDayWidth)} | ${"Interest".padStart(maxInterestWidth)} | ${"Balance".padStart(maxBalanceWidth)}")
+        for ((d, i, b) in rows) {
+            println("${d.padStart(maxDayWidth - 1)}  | ${i.padStart(maxInterestWidth - 2)}   | ${b.padStart(maxBalanceWidth)}")
         }
     }
     fun displayBalance() {
