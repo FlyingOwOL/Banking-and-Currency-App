@@ -1,3 +1,8 @@
+/********************
+Last names: Dela Torre, Espada, Laugerta, Sy
+Language: Rust
+Paradigm(s): Imperative, Functional
+*********************/
 use std::io::{self, Write};
 
 #[derive(PartialEq, Copy, Clone)]
@@ -394,4 +399,5 @@ pub fn run() {
 
 fn main() {
     run();
+
 }
