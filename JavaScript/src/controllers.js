@@ -1,3 +1,11 @@
+/*
+********************
+Last names: Dela Torre, Espada, Laguerta, Sy
+Language: JavaScript
+Paradigm(s): Object-Oriented, Functional, Procedural
+********************
+ */
+
 import * as display from "./display_choices.js";
 import * as model from "./model.js";
 import { prompt } from "./main.js";

@@ -1,3 +1,11 @@
+/*
+********************
+Last names: Dela Torre, Espada, Laguerta, Sy
+Language: JavaScript
+Paradigm(s): Object-Oriented, Functional, Procedural
+********************
+ */
+
 export function spacing(){
     console.log("\n\n\n");
 }

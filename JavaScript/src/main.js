@@ -1,3 +1,11 @@
+/*
+********************
+Last names: Dela Torre, Espada, Laguerta, Sy
+Language: JavaScript
+Paradigm(s): Object-Oriented, Functional, Procedural
+********************
+ */
+
 import promptSync from "prompt-sync";
 export const prompt = promptSync();
 

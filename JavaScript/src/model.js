@@ -1,3 +1,11 @@
+/*
+********************
+Last names: Dela Torre, Espada, Laguerta, Sy
+Language: JavaScript
+Paradigm(s): Object-Oriented, Functional, Procedural
+********************
+ */
+
 // Follow Java OOP conventions to simplify my life ffs
 
 // Define Account class
@@ -5,14 +13,14 @@ export class account {
     accountName;
     balance;
     currency;
-    annualInterestRate;
+    annualInterestRate; //The woll of wof strit yeh?
 
     // Constructor for new accounts
     constructor(accountName){
         this.accountName = accountName;
         this.balance = 0;
         this.currency = 'PHP';
-        this.annualInterestRate = 0.05; // 5% default annual interest rate
+        this.annualInterestRate = 0.05; // 5% default annual interest rate fixed
     }
 
     // getters
