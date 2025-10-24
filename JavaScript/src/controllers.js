@@ -153,6 +153,12 @@ export function recordExchangeRates(currencyObject){
         if(currency == null){
             display.recordExchangeRates();
             currency = Number(prompt("Select Foreign Currency: ")); 
+
+            if (currency == 1){
+                console.log("PHP is always 1.0\n");
+                currency = null;
+                continue;
+            }
         } 
 
         if (currency > 1 && currency < 7 && 
@@ -178,7 +184,7 @@ export function recordExchangeRates(currencyObject){
         }
         
         returnToMain = prompt("Back to the Main Menu (Y/N): ");
-        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
+        if(returnToMain.toLowerCase() != 'n' && returnToMain.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
             continue;
         }
@@ -278,7 +284,7 @@ export function currencyExchange(currencyObject){
 
          
         repeat = prompt("Convert another currency (Y/N)? . . . ");
-        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
+        if(repeat.toLowerCase() != 'n' && repeat.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
             isSuccessful = false;
             continue;
@@ -339,7 +345,7 @@ export function showInterestComputation(account){
 
 
         returnToMain = prompt("Back to the Main Menu(Y/N): ");
-        if(userChoice.toLowerCase() != 'n' && userChoice.toLowerCase() != 'y'){
+        if(returnToMain.toLowerCase() != 'n' && returnToMain.toLowerCase() != 'y'){
             console.log("Only choose from y or n\n");
             isSuccessful = false;
             continue;
