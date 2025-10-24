@@ -1,0 +1,1 @@
+C:\Users\Joramm\source\repos\Rust\bank-application\target\release\bank-application.exe: C:\Users\Joramm\source\repos\Rust\bank-application\src\function.rs C:\Users\Joramm\source\repos\Rust\bank-application\src\main.rs
