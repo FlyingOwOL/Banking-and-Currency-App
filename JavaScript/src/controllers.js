@@ -351,6 +351,7 @@ export function showInterestComputation(account){
             continue;
         } else {
             isSuccessful = true;
+            days = null;
         }
     }while (returnToMain.toLowerCase() != 'y');
 }
