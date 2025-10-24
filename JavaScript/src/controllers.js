@@ -97,7 +97,7 @@ export function depositToAccount(account){
     } while(userChoice.toLowerCase() != 'y');
 }
 
-export function withdrawFromAccount(account){ //implicitly typed as a account object
+export function withdrawFromAccount(account){ 
     let amount = null;
     let userChoice = 'n';
     let parseAmount;
@@ -124,7 +124,7 @@ export function withdrawFromAccount(account){ //implicitly typed as a account ob
         } else if (parseAmount > account.balance){
             console.log("Amount must be less than the current balance.\n");
             amount = null;
-            continue;
+            parseAmount = 0;
         }
 
         if (isSuccessful){
