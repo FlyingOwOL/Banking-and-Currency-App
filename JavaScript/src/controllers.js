@@ -15,12 +15,12 @@ export function registerAccount(){
     let userChoice = 'n';
     let accountName = null;
 
-    account = new model.account(accountName);
     do{
         if (accountName == null){
             console.log('Register Account Name');
             accountName = prompt('Account Name:');
             console.log('');            
+            account = new model.account(accountName);
         }
 
         if (accountName.trim() === ''){  //if the name is blank, repeat
