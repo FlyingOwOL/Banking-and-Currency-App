@@ -334,7 +334,7 @@ runState <- function(state=0) {
 			"\n>>>"
 		)))
 		
-		if (is.na(prompt_ret))
+		if (is.na(prompt_ret)||floor(prompt_ret)!=prompt_ret)
 			return(0)
 		if (prompt_ret>=1&&prompt_ret<=6)
 			return(prompt_ret)
@@ -349,7 +349,9 @@ runState <- function(state=0) {
 			state3(),
 			state4(),
 			state5(),
-			state6()
+			state6(),
+			0,
+			runState()
 		))
 	}
 }
