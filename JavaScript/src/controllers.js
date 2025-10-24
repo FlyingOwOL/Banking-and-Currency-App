@@ -8,7 +8,7 @@ Paradigm(s): Object-Oriented, Functional, Procedural
 
 import * as display from "./display_choices.js";
 import * as model from "./model.js";
-import { prompt } from "./main.js";
+import { prompt } from "./MP_4_JavaScript.js";
 
 export function registerAccount(){
     let account;
